@@ -24,7 +24,7 @@ func main() {
 		fmt.Println(k, v)
 	} //k或者v都是可以省略的
 	for k := range m {
-		fmt.Println(k)
+		fmt.Println("只写一个参数接收的时候，接收的是key：" + k)
 	}
 	for _, v := range m {
 		fmt.Println(v)
@@ -32,7 +32,7 @@ func main() {
 	//这个map是一个hashMap，key是无序的，所以每次遍历得到的结果都不太一样
 	fmt.Println("Getting values")
 	courseName, ok := m["course"] //当key不存在时，得到得值是一个空串，go语言不怕变量不初始化
-	fmt.Println(courseName, ok)
+	fmt.Println(courseName, ok)   //输出的是map里的键“course”对应的值和是否存在的boolean值
 	//那么怎么判断key是否存在呢
 	causeName, ok := m["cause"]
 	fmt.Println(causeName, ok)

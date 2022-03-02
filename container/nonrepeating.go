@@ -7,21 +7,22 @@ import (
 
 //寻找最长不重复子串
 func lengthOfNonRepeatingSubStr(s string) int {
-	lastOccurred := make(map[byte]int)
+	lastOccurred := make(map[byte]int) //创建一个Map集合
 	start := 0
 	maxLength := 0
 
-	for i, ch := range []byte(s) { //这里转为byte只支持英文字母了unicode编码的原因
+	for index, ch := range []byte(s) { //这里转为byte只支持英文字母了unicode编码的原因
+		//Map的特性就是键不会重复，这里的Map键是字符串中拆解的字符，值是每个字符的下标
 		if lastI, ok := lastOccurred[ch]; ok && lastI >= start {
 			start = lastI + 1
 		}
 		if lastOccurred[ch] >= start {
-			start = lastOccurred[ch] + 1
+			start = lastOccurred[ch] + 1 //更新其实下
 		}
-		if i-start+1 > maxLength {
-			maxLength = i - start + 1
+		if index-start+1 > maxLength {
+			maxLength = index - start + 1 //更新最长不重复子串的结果
 		}
-		lastOccurred[ch] = i
+		lastOccurred[ch] = index //把字符的下标更新到Map中
 	}
 	return maxLength
 }
