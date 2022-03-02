@@ -20,12 +20,12 @@ func main() {
 	printSlice(s3)
 
 	fmt.Println("Copying slice")
-	copy(s2, s1)
+	copy(s2, s1) //把s1的元素“填充”到s2中
 	printSlice(s2)
 
 	//删除操作
 	fmt.Println("Deleting elements from slice")
-	s2 = append(s2[:3], s2[4:]...)
+	s2 = append(s2[:3], s2[4:]...) //删除下标为3的元素
 	printSlice(s2)
 
 	fmt.Println("Popping from front")
