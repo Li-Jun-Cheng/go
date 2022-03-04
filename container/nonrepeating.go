@@ -45,5 +45,4 @@ func main() {
 	for i, ch := range []rune(s) {
 		fmt.Printf("(%d %c)", i, ch) //我们就能获得第几个字符是谁
 	}
-
 }
