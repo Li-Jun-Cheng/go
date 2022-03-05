@@ -38,10 +38,34 @@ func main() {
 	pRoot.print()
 	pRoot.setValue(200)
 	pRoot.print()
-	var mRoot *Node
+	var mRoot *tree.Node
 	mRoot.setValue(800)
 	mRoot = &root
 	mRoot.setValue(300)
 	mRoot.print()
+	fmt.Println()
 
+	hroot := myThreeNode{&root}
+	hroot.postOrder()
+	fmt.Println()
+}
+
+type myThreeNode struct { //这里先定义了一个结构体
+	node *tree.Node //结构体中的属性是一个tree包下的Node结构体指针
+}
+
+func (myNode *myThreeNode) postOrder() { //这里定义了一个myThreeNode的指针接收者
+	if myNode == nil || myNode.node == nil {
+		return
+	}
+	//literal:字面常量或者称为字面量
+	//myThreeNode{myNode.node.Left}就是一个 literal ,literal不可以直接取到地址(cannot take the address of myThreeNode literal)
+	//先弄一个变量去得到字面量的地址才能  .postOrder()
+	left := myThreeNode{myNode.node.Left}
+	right := myThreeNode{myNode.node.Right}
+	left.postOrder() //给myThreeNode中的node指针赋值，该指针指向了tree包下的Node结构体，
+	// 然后myThreeNode这个结构体调用了自己的指针接收者postOrder,这里又是递归，自身调用自身，实现了后序遍历，先是左子树然后右子树最后到自己
+	//中序和后序，这里的中是指自己是在中间被遍历到还是最后被遍历到
+	right.postOrder()
+	myNode.node.Print()
 }

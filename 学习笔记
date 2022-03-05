@@ -11,3 +11,229 @@
 包名可以和目录名不一样。但是每个目录只能有一个包。main包包含可执行入口，里面包含一个main函数。
 
 为结构定义的方法必须放在同一个包内,但是可以是不同的文件
+
+包
+包的本质实际上就是创建不同的文件夹，来存放程序文件。
+go 的每一个文件都是属于一个包的，也就是说 go 是以包的形式来管理文件和项目目录结构
+
+包的三大作用
+
+区分相同名字的函数、变量等标识符
+当程序文件很多时,可以很好的管理项目
+控制函数、变量等访问范围，即作用域
+打包基本语法
+
+    package 包名
+引入包的基本语法
+
+    import "包的路径"
+注意事项
+
+在给一个文件打包时，该包对应一个文件夹，比如这里的 utils 文件夹对应的包名就是 utils,文件的包名通常和文件所在的文件夹名一致，一般为小写字母。
+当一个文件要使用其它包函数或变量时，需要先引入对应的包
+引入方式 1：
+    import "包名"
+引入方式 2：
+    import (
+        "包名"
+        "包名"
+    )
+package 指令在 文件第一行，然后是 import 指令。
+在 import 包时，路径从 $GOPATH 的 src 下开始，不用带 src , 编译器会自动从 src 下开始引入
+为了让其它包的文件，可以访问到本包的函数，则该函数名的首字母需要大写，类似其它语言的 public ,这样才能跨包访问。比如 utils.go 的
+在访问其它包函数，变量时，其语法是 包名.函数名， 比如这里的 main.go 文件中
+如果包名较长，Go 支持给包取别名， 注意细节：取别名后，原来的包名就不能使用了
+说明: 如果给包取了别名，则需要使用别名来访问该包的函数和变量。
+在同一包下，不能有相同的函数名（也不能有相同的全局变量名），否则报重复定义
+如果你要编译成一个可执行程序文件，就需要将这个包声明为 main , 即 package main .这个就是一个语法规范，如果你是写一个库 ，包名可以自定义
+闭包
+闭包的概念：
+是可以包含自由（未绑定到特定对象）变量的代码块，这些变量不在这个代码块内或者任何全局上下文中定义，而是在定义代码块的环境中定义。要执行的代码块（由于自由变量包含在代码块中，所以这些自由变量以及它们引用的对象没有被释放）为自由变量提供绑定的计算环境（作用域）。
+
+闭包的价值 :
+闭包的价值在于可以作为函数对象或者匿名函数，对于类型系统而言，这意味着不仅要表示数据还要表示代码。支持闭包的多数语言都将函数作为第一级对象，就是说这些函数可以存储到变量中作为参数传递给其他函数，最重要的是能够被函数动态创建和返回。
+
+Go语言中的闭包同样也会引用到函数外的变量。闭包的实现确保只要闭包还被使用，那么被闭包引用的变量会一直存在。
+
+    //累加器
+    func AddUpper() func (int) int {
+        var n int = 10
+        var str = "hello"
+        return func (x int) int {
+            n = n + x
+            return n
+        }
+    }
+
+    func main() {
+        //使用前面的代码
+        f := AddUpper()
+        fmt.Println(f(1))// 11
+        fmt.Println(f(2))// 13
+        fmt.Println(f(3))// 16
+    }
+
+总结：
+闭包并不是一门编程语言不可缺少的功能，但闭包的表现形式一般是以匿名函数的方式出现，就象上面说到的，能够动态灵活的创建以及传递，体现出函数式编程的特点。所以在一些场合，我们就多了一种编码方式的选择，适当的使用闭包可以使得我们的代码简洁高效。
+
+使用闭包的注意点
+由于闭包会使得函数中的变量都被保存在内存中，内存消耗很大，所以不能滥用闭包
+
+init函数
+每一个源文件都可以包含一个 init 函数，该函数会在 main 函数执行前，被 Go 运行框架调用，也就是说 init 会在 main 函数前被调用。
+
+如果一个文件同时包含全局变量定义， 函数和 main 函数，init则执行的流程全局变量定义->init函数->main 函数
+init 函数最主要的作用，就是完成一些初始化的工作
+如果 主包 和 引用包 都含有 变量定义，init 函数时，执行的流程 引用包变量定义->引用包init 函数 ->主包变量定义->主包init 函数->主包main 函数
+
+匿名函数
+Go 支持匿名函数，匿名函数就是没有名字的函数，如果我们某个函数只是希望使用一次，可以考虑使用匿名函数，匿名函数也可以实现多次调用。跟匿名内部类差不多
+
+
+参数传递方式
+两种传递方式
+值传递
+引用传递
+其实，不管是值传递还是引用传递，传递给函数的都是变量的副本，不同的是，值传递的是值的拷贝，引用传递的是地址的拷贝，一般来说，地址拷贝效率高，因为数据量小，而值拷贝决定拷贝的数据大小，数据越大，效率越低。
+值类型和引用类型
+值类型：基本数据类型 int 系列, float 系列, bool, string 、数组和结构体 struct
+引用类型：指针、slice 切片、map、管道 chan、interface 等都是引用类型
+值传递和引用传递使用特点
+值类型默认是值传递:变量直接存储值，内存通常在栈中分配
+引用类型默认是引用传递， 变量存储的是一个地址，这个地址对应的空间才真正存储数据(值)，内存通常在堆上分配，当投有任何变量引用这个地址时，该地址对应的数据空间就成为一个垃圾，由GC来回收。
+如果希望函数内的变量能修改函数外的变量，可以传入变量的地址&，函数内以指针的方式操作变量。从效果上看类似引用 。
+变量作用域
+函数内部声明/定义的变量叫局部变量，作用域仅限于函数内部
+函数外部声明/定义的变量叫全局变量，作用域在整个包都有效，如果其首字母为大写，则作用域在整个程序有效
+如果变量是在一个代码块，比如 for / if 中，那么这个变量的的作用域就在该代码块
+字符串常用的系统函数
+统计字符串的长度，按字节 len(str)
+字符串遍历，同时处理有中文的问题 r := []rune(str)
+字符串转整数: n, err := strconv.Atoi("12")
+整数转字符串 str = strconv.Itoa(12345)
+字符串 转 []byte: var bytes = []byte("hello go")
+[]byte 转 字符串: str = string([]byte{97, 98, 99})
+10 进制转 2, 8, 16 进制: str = strconv.FormatInt(123, 2) // 2-> 8 , 16
+查找子串是否在指定的字符串中: strings.Contains("seafood", "foo") //true
+统计一个字符串有几个指定的子串 ： strings.Count("ceheese", "e") //4
+不 区 分 大 小 写 的 字 符 串 比 较 (== 是 区 分 字 母 大 小 写 的 ): fmt.Println(strings.EqualFold("abc","Abc")) // true
+返回子串在字符串第一次出现的 index 值，如果没有返回-1 : strings.Index("NLT_abc", "abc") // 4
+返回子串在字符串最后一次出现的 index，如没有返回-1 : strings.LastIndex("go golang", "go")
+将指定的子串替换成 另外一个子串: strings.Replace("go go hello", "go", "go 语言", n) n 可以指定你希望替换几个，如果 n=-1 表示全部替换
+按照指定的某个字符，为分割标识，将一个字符串拆分成字符串数组 ：strings.Split("hello,wrold,ok", ",")
+将字符串的字母进行大小写的转换: strings.ToLower("Go") // go strings.ToUpper("Go") // GO
+将字符串左右两边的空格去掉： strings.TrimSpace(" tn a lone gopher ntrn ")
+将字符串左右两边指定的字符去掉 ： strings.Trim("! hello! ", " !") //将左右两边 !和 " "去掉 // ["hello"]
+将字符串左边指定的字符去掉 ： strings.TrimLeft("! hello! ", " !") //将左边 !和 " "去掉 // ["hello"]
+将字符串右边指定的字符去掉 ：strings.TrimRight("! hello! ", " !") //将右边 !和 " "去掉 // ["hello"]
+判断字符串是否以指定的字符串开头: strings.HasPrefix("ftp://192.168.10.1", "ftp") // true
+判断字符串是否以指定的字符串结束: strings.HasSuffix("NLT_abc.jpg", "abc") //false
+时间和日期相关函数
+时间和日期相关函数，需要导入 time 包
+time.Time 类型，用于表示时间
+获取日期信息
+	//看看日期和时间相关函数和方法使用
+	//1. 获取当前时间
+	now := time.Now()
+	fmt.Printf("now=%v now type=%T\n", now, now)
+
+	//2.通过now可以获取到年月日，时分秒
+	fmt.Printf("年=%v\n", now.Year())
+	fmt.Printf("月=%v\n", now.Month())
+	fmt.Printf("月=%v\n", int(now.Month()))
+	fmt.Printf("日=%v\n", now.Day())
+	fmt.Printf("时=%v\n", now.Hour())
+	fmt.Printf("分=%v\n", now.Minute())
+	fmt.Printf("秒=%v\n", now.Second())
+格式化日期时间
+方式 1: 就是使用 Printf 或者 SPrintf
+	fmt.Printf("当前年月日 %d-%d-%d %d:%d:%d \n", now.Year(),
+	now.Month(), now.Day(), now.Hour(), now.Minute(), now.Second())
+
+	dateStr := fmt.Sprintf("当前年月日 %d-%d-%d %d:%d:%d \n", now.Year(),
+	now.Month(), now.Day(), now.Hour(), now.Minute(), now.Second())
+
+	fmt.Printf("dateStr=%v\n", dateStr)
+方式 2: 使用 time.Format() 方法完成:
+    //Format根据layout指定的格式返回t代表的时间点的格式化文本表示。
+    //layout定义了参考时间：2006年1月2日15时04分05秒是Go语言诞生的日子
+    //记忆方法：6-1-2-3-4-5
+	fmt.Printf(now.Format("2006-01-02 15:04:05"))
+	fmt.Println()
+	fmt.Printf(now.Format("2006-01-02"))
+	fmt.Println()
+	fmt.Printf(now.Format("15:04:05"))
+	fmt.Println()
+	fmt.Printf(now.Format("2006"))
+	fmt.Println()
+时间的常量
+time 组成：
+time.Duration（时间长度，消耗时间）
+time.Time（时间点）
+time.C（放时间的channel通道）（注：Time.C:=make(chan time.Time)）
+
+    const (
+        Nanosecond    Duration = 1 //纳秒
+        Microsecond = 1000 * Nanosecond //微秒
+        Millisecond = 1000 * Microsecond //毫秒
+        Second = 1000 * Millisecond //秒
+        Minute = 60 * Second //分钟
+        Hour = 60 * Minute //小时
+    )
+
+    常量的作用:在程序中可用于获取指定时间单位的时间，比如想得到 100 毫秒
+    100 * time. Millisecond
+
+休眠
+	time.Sleep(time.Second)
+	time.Sleep(time.Millisecond * 100)
+time 的 Unix时间戳 和 UnixNano时间戳 的方法
+Unix将t表示为Unix时间，即从时间点January 1, 1970 UTC到时间点t所经过的时间（单位秒）。
+UnixNano将t表示为Unix时间，即从时间点January 1, 1970 UTC到时间点t所经过的时间（单位纳秒）
+    fmt.Printf("unix时间戳=%v unixnano时间戳=%v\n", now.Unix(), now.UnixNano())
+错误机制
+在默认情况下，当发生错误后(panic) ,程序就会退出（崩溃）。Go 语言追求简洁优雅，所以，Go 语言不支持传统的 try…catch…finally 这种处理。Go 中引入的处理方式为：defer, panic, recover
+
+Go 中可以抛出一个 panic 的异常，然后在 defer 中通过 recover 捕获这个异常，然后正常处理
+
+    func test() {
+        //使用defer + recover 来捕获和处理异常
+        defer func() {
+            err := recover()  // recover()内置函数，可以捕获到异常
+            if err != nil {  // 说明捕获到错误
+                fmt.Println("err=", err)
+                //处理异常
+            }
+        }()
+        num1 := 10
+        num2 := 0
+        res := num1 / num2
+        fmt.Println("res=", res)
+    }
+进行错误处理后，程序不会轻易挂掉，如果加入预警代码，就可以让程序更加的健壮。
+
+自定义异常
+Go 程序中，也支持自定义错误， 使用 errors.New 和 panic 内置函数。
+
+errors.New("错误说明") , 会返回一个 error 类型的值，表示一个错误
+panic 内置函数 ,接收一个 interface{}类型的值（也就是任何值了）作为参数。可以接收 error 类型的变量，输出错误信息，并退出程序.
+    //函数去读取以配置文件init.conf的信息
+    //如果文件名传入不正确，我们就返回一个自定义的异常
+    func readConf(name string) (err error) {
+        if name == "config.ini" {
+            //读取...
+            return nil
+        } else {
+            //返回一个自定义异常
+            return errors.New("readConf Exception..")
+        }
+    }
+
+    func main() {
+        err := readConf("config2.ini")
+        if err != nil {
+            //如果读取文件发送错误，就输出这个错误，并终止程序
+            panic(err)
+        }
+        fmt.Println("test02()继续执行....")  //异常退出后 不会执行
+    }

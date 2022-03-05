@@ -52,6 +52,7 @@ func swapPlus(a, b int) (int, int) {
 }
 
 //Go语言没有什么默认参数，函数重载这些东西，只有一个可变长度参数
+//如果一个函数的形参列表中有可变参数，则可变参数需要放在形参列表最后
 func sum(numbers ...int) int {
 	s := 0
 	for i := range numbers {
@@ -96,8 +97,10 @@ func eval(a, b int, op string) (int, error) {
 //输出一个参数int,这两个参数来源与后面的a,b,参数的类型是int,最后定义了apply的返回值是int
 //go语言名在前，类型在后的这种写法在定义复合函数的时候变的更容易
 //语义分析：有一个函数apply传进去一个函数，参数是a,b.得到这个传进去参数的返回值，将返回值int作为apply的参数进入到apply这个函数里，最后返回值是Int
+//在 Go 中，函数也是一种数据类型，可以赋值给一个变量，则该变量就是一个函数类型的变量了。通过该变量可以对函数调用
+//函数既然是一种数据类型，因此在 Go 中，函数可以作为形参，并且调用
 func apply(op func(int, int) int, a, b int) int {
-	//reflect这个包，它呢可以进行反射，去获得这个op里真正的值，Pointer获得这个函数真正的指针，指向了传进来的这个函数，最后通过指针得到这个函数的名字
+	//reflect这个包，它呢可以进行反射，去获得这个op(函数变量)里真正的值，Pointer获得这个函数真正的指针，指向了传进来的这个函数，最后通过指针得到这个函数的名字
 	p := reflect.ValueOf(op).Pointer()
 	opName := runtime.FuncForPC(p).Name()
 	//Printf即格式化输出，opName,a,b依次会填充到%s %d %d这个三个位置，填充的数据类型%s代表字符串，%d代表整数
